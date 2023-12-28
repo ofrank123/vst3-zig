@@ -1,5 +1,6 @@
 const std = @import("std");
 const c = @import("ext/vst3.zig");
+const assert = std.debug.assert;
 
 pub const std_options = struct {
     pub const log_level = .debug;
@@ -49,6 +50,7 @@ fn parseGuid(str: []const u8) Guid {
 }
 
 fn FUnknown(comptime name: []const u8, comptime interfaces: []const Interface) type {
+    _ = name;
     return struct {
         const vtbl = c.Steinberg_FUnknownVtbl{
             .queryInterface = queryInterface,
@@ -57,7 +59,6 @@ fn FUnknown(comptime name: []const u8, comptime interfaces: []const Interface) t
         };
 
         fn queryInterface(self: *anyopaque, iid: [*]const u8, obj: *?*anyopaque) callconv(.C) c.Steinberg_tresult {
-            std.log.debug("{s}.queryInterface", .{name});
             for (interfaces) |interface| {
                 if (std.mem.eql(u8, iid[0..16], &interface.cid)) {
                     const interface_ptr: *c.Steinberg_FUnknown =
@@ -73,13 +74,13 @@ fn FUnknown(comptime name: []const u8, comptime interfaces: []const Interface) t
 
         // TODO(oliver): Handle ref counting properly
         fn addRef(self: *anyopaque) callconv(.C) c.Steinberg_uint32 {
-            std.log.debug("{s}.addRef\t{p}", .{ name, self });
+            _ = self;
             return 1;
         }
 
         // TODO(oliver): Handle ref counting properly
         fn release(self: *anyopaque) callconv(.C) c.Steinberg_uint32 {
-            std.log.debug("{s}.release\t{p}", .{ name, self });
+            _ = self;
             return 1;
         }
     };
@@ -241,19 +242,28 @@ fn EditController(comptime interfaces: []const Interface) type {
             .createView = createView,
         };
 
-        fn setComponentState(self: *c.Steinberg_Vst_IEditController, state: *c.Steinberg_IBStream) callconv(.C) c.Steinberg_tresult {
+        fn setComponentState(
+            self: *c.Steinberg_Vst_IEditController,
+            state: *c.Steinberg_IBStream,
+        ) callconv(.C) c.Steinberg_tresult {
             _ = state;
             _ = self;
             return c.Steinberg_kResultOk;
         }
 
-        fn setState(self: *c.Steinberg_Vst_IEditController, state: *c.Steinberg_IBStream) callconv(.C) c.Steinberg_tresult {
+        fn setState(
+            self: *c.Steinberg_Vst_IEditController,
+            state: *c.Steinberg_IBStream,
+        ) callconv(.C) c.Steinberg_tresult {
             _ = state;
             _ = self;
             return c.Steinberg_kResultOk;
         }
 
-        fn getState(self: *c.Steinberg_Vst_IEditController, state: *c.Steinberg_IBStream) callconv(.C) c.Steinberg_tresult {
+        fn getState(
+            self: *c.Steinberg_Vst_IEditController,
+            state: *c.Steinberg_IBStream,
+        ) callconv(.C) c.Steinberg_tresult {
             _ = state;
             _ = self;
             return c.Steinberg_kResultOk;
@@ -264,14 +274,23 @@ fn EditController(comptime interfaces: []const Interface) type {
             return 0;
         }
 
-        fn getParameterInfo(self: *c.Steinberg_Vst_IEditController, param_idx: c.Steinberg_int32, info: *c.Steinberg_Vst_ParameterInfo) callconv(.C) c.Steinberg_tresult {
+        fn getParameterInfo(
+            self: *c.Steinberg_Vst_IEditController,
+            param_idx: c.Steinberg_int32,
+            info: *c.Steinberg_Vst_ParameterInfo,
+        ) callconv(.C) c.Steinberg_tresult {
             _ = info;
             _ = param_idx;
             _ = self;
             return c.Steinberg_kResultFalse;
         }
 
-        fn getParamStringByValue(self: *c.Steinberg_Vst_IEditController, id: c.Steinberg_Vst_ParamID, value_normalized: c.Steinberg_Vst_ParamValue, string: [*:0]c.Steinberg_Vst_TChar) callconv(.C) c.Steinberg_tresult {
+        fn getParamStringByValue(
+            self: *c.Steinberg_Vst_IEditController,
+            id: c.Steinberg_Vst_ParamID,
+            value_normalized: c.Steinberg_Vst_ParamValue,
+            string: [*:0]c.Steinberg_Vst_TChar,
+        ) callconv(.C) c.Steinberg_tresult {
             _ = string;
             _ = value_normalized;
             _ = id;
@@ -279,7 +298,12 @@ fn EditController(comptime interfaces: []const Interface) type {
             return c.Steinberg_kResultFalse;
         }
 
-        fn getParamValueByString(self: *c.Steinberg_Vst_IEditController, id: c.Steinberg_Vst_ParamID, string: [*:0]c.Steinberg_Vst_TChar, value_normalized: *c.Steinberg_Vst_ParamValue) callconv(.C) c.Steinberg_tresult {
+        fn getParamValueByString(
+            self: *c.Steinberg_Vst_IEditController,
+            id: c.Steinberg_Vst_ParamID,
+            string: [*:0]c.Steinberg_Vst_TChar,
+            value_normalized: *c.Steinberg_Vst_ParamValue,
+        ) callconv(.C) c.Steinberg_tresult {
             _ = value_normalized;
             _ = string;
             _ = id;
@@ -287,40 +311,61 @@ fn EditController(comptime interfaces: []const Interface) type {
             return c.Steinberg_kResultFalse;
         }
 
-        fn normalizedParamToPlain(self: *c.Steinberg_Vst_IEditController, id: c.Steinberg_Vst_ParamID, value_normalized: c.Steinberg_Vst_ParamValue) callconv(.C) c.Steinberg_Vst_ParamValue {
+        fn normalizedParamToPlain(
+            self: *c.Steinberg_Vst_IEditController,
+            id: c.Steinberg_Vst_ParamID,
+            value_normalized: c.Steinberg_Vst_ParamValue,
+        ) callconv(.C) c.Steinberg_Vst_ParamValue {
             _ = value_normalized;
             _ = id;
             _ = self;
             return 0;
         }
 
-        fn plainParamToNormalized(self: *c.Steinberg_Vst_IEditController, id: c.Steinberg_Vst_ParamID, value_plain: c.Steinberg_Vst_ParamValue) callconv(.C) c.Steinberg_Vst_ParamValue {
+        fn plainParamToNormalized(
+            self: *c.Steinberg_Vst_IEditController,
+            id: c.Steinberg_Vst_ParamID,
+            value_plain: c.Steinberg_Vst_ParamValue,
+        ) callconv(.C) c.Steinberg_Vst_ParamValue {
             _ = value_plain;
             _ = id;
             _ = self;
             return 0;
         }
 
-        fn getParamNormalized(self: *c.Steinberg_Vst_IEditController, id: c.Steinberg_Vst_ParamID) callconv(.C) c.Steinberg_Vst_ParamValue {
+        fn getParamNormalized(
+            self: *c.Steinberg_Vst_IEditController,
+            id: c.Steinberg_Vst_ParamID,
+        ) callconv(.C) c.Steinberg_Vst_ParamValue {
             _ = id;
             _ = self;
             return 0;
         }
 
-        fn setParamNormalized(self: *c.Steinberg_Vst_IEditController, id: c.Steinberg_Vst_ParamID, value: c.Steinberg_Vst_ParamValue) callconv(.C) c.Steinberg_tresult {
+        fn setParamNormalized(
+            self: *c.Steinberg_Vst_IEditController,
+            id: c.Steinberg_Vst_ParamID,
+            value: c.Steinberg_Vst_ParamValue,
+        ) callconv(.C) c.Steinberg_tresult {
             _ = value;
             _ = id;
             _ = self;
             return c.Steinberg_kResultOk;
         }
 
-        fn setComponentHandler(self: *c.Steinberg_Vst_IEditController, handler: *c.Steinberg_Vst_IComponentHandler) callconv(.C) c.Steinberg_tresult {
+        fn setComponentHandler(
+            self: *c.Steinberg_Vst_IEditController,
+            handler: *c.Steinberg_Vst_IComponentHandler,
+        ) callconv(.C) c.Steinberg_tresult {
             _ = handler;
             _ = self;
             return c.Steinberg_kResultOk;
         }
 
-        fn createView(self: *c.Steinberg_Vst_IEditController, name: c.Steinberg_FIDString) callconv(.C) ?*c.Steinberg_IPlugView {
+        fn createView(
+            self: *c.Steinberg_Vst_IEditController,
+            name: c.Steinberg_FIDString,
+        ) callconv(.C) ?*c.Steinberg_IPlugView {
             _ = name;
             _ = self;
             return null;
@@ -334,13 +379,153 @@ fn EditController(comptime interfaces: []const Interface) type {
     };
 }
 
+fn AudioProcessor(comptime interfaces: []const Interface) type {
+    const FUnknown_vtbl = FUnknown("AudioController", interfaces).vtbl;
+    return struct {
+        const vtbl = c.Steinberg_Vst_IAudioProcessorVtbl{
+            .queryInterface = FUnknown_vtbl.queryInterface,
+            .addRef = FUnknown_vtbl.addRef,
+            .release = FUnknown_vtbl.release,
+            .setBusArrangements = setBusArrangements,
+            .getBusArrangement = getBusArrangement,
+            .canProcessSampleSize = canProcessSampleSize,
+            .getLatencySamples = getLatencySamples,
+            .setupProcessing = setupProcessing,
+            .setProcessing = setProcessing,
+            .process = process,
+            .getTailSamples = getTailSamples,
+        };
+
+        fn setBusArrangements(
+            self: *c.Steinberg_Vst_IAudioProcessor,
+            inputs: *c.Steinberg_Vst_SpeakerArrangement,
+            num_ins: c.Steinberg_int32,
+            outputs: *c.Steinberg_Vst_SpeakerArrangement,
+            num_outs: c.Steinberg_int32,
+        ) callconv(.C) c.Steinberg_tresult {
+            _ = num_outs;
+            _ = outputs;
+            _ = num_ins;
+            _ = inputs;
+            _ = self;
+            return c.Steinberg_kResultFalse;
+        }
+
+        fn getBusArrangement(
+            self: *c.Steinberg_Vst_IAudioProcessor,
+            dir: c.Steinberg_Vst_BusDirection,
+            idx: c.Steinberg_int32,
+            arr: *c.Steinberg_Vst_SpeakerArrangement,
+        ) callconv(.C) c.Steinberg_tresult {
+            _ = idx;
+            _ = dir;
+            _ = self;
+            if (arr.* == c.Steinberg_Vst_SpeakerArr_kEmpty or
+                arr.* == c.Steinberg_Vst_kSpeakerL or
+                arr.* == c.Steinberg_Vst_SpeakerArr_kStereo)
+            {
+                return c.Steinberg_kResultOk;
+            } else {
+                arr.* = c.Steinberg_Vst_SpeakerArr_kStereo;
+                return c.Steinberg_kResultOk;
+            }
+        }
+
+        fn canProcessSampleSize(
+            self: *c.Steinberg_Vst_IAudioProcessor,
+            symbolic_sample_size: c.Steinberg_int32,
+        ) callconv(.C) c.Steinberg_tresult {
+            _ = symbolic_sample_size;
+            _ = self;
+            return c.Steinberg_kResultOk;
+        }
+
+        fn getLatencySamples(self: *c.Steinberg_Vst_IAudioProcessor) callconv(.C) c.Steinberg_uint32 {
+            _ = self;
+            return 0;
+        }
+
+        fn setupProcessing(
+            self: *c.Steinberg_Vst_IAudioProcessor,
+            setup: *c.Steinberg_Vst_ProcessSetup,
+        ) callconv(.C) c.Steinberg_tresult {
+            _ = setup;
+            _ = self;
+            return c.Steinberg_kResultOk;
+        }
+
+        fn setProcessing(
+            self: *c.Steinberg_Vst_IAudioProcessor,
+            state: c.Steinberg_TBool,
+        ) callconv(.C) c.Steinberg_tresult {
+            _ = state;
+            _ = self;
+            return c.Steinberg_kResultOk;
+        }
+
+        fn copy_samples(
+            comptime T: type,
+            num_samples: usize,
+            input_buffers: [][*]T,
+            output_buffers: [][*]T,
+        ) void {
+            for (input_buffers, output_buffers[0..input_buffers.len]) |input, output| {
+                @memcpy(output[0..num_samples], input[0..num_samples]);
+            }
+        }
+
+        fn process(
+            self: *c.Steinberg_Vst_IAudioProcessor,
+            data: *c.Steinberg_Vst_ProcessData,
+        ) callconv(.C) c.Steinberg_tresult {
+            _ = self;
+            if (data.numInputs == 0 or data.numOutputs == 0) {
+                return c.Steinberg_kResultOk;
+            }
+
+            const num_channels: usize = @intCast(data.inputs[0].numChannels);
+
+            if (data.symbolicSampleSize == c.Steinberg_Vst_SymbolicSampleSizes_kSample32) {
+                copy_samples(
+                    f32,
+                    @intCast(data.numSamples),
+                    data.inputs[0].buffers.channelBuffers32[0..num_channels],
+                    data.outputs[0].buffers.channelBuffers32[0..num_channels],
+                );
+            } else {
+                copy_samples(
+                    f64,
+                    @intCast(data.numSamples),
+                    data.inputs[0].buffers.channelBuffers64[0..num_channels],
+                    data.outputs[0].buffers.channelBuffers64[0..num_channels],
+                );
+            }
+
+            return c.Steinberg_kResultOk;
+        }
+
+        fn getTailSamples(self: *c.Steinberg_Vst_IAudioProcessor) callconv(.C) c.Steinberg_uint32 {
+            _ = self;
+            return 0;
+        }
+
+        fn create() c.Steinberg_Vst_IAudioProcessor {
+            return c.Steinberg_Vst_IAudioProcessor{
+                .lpVtbl = &vtbl,
+            };
+        }
+    };
+}
+
 const PluginClass = struct {
     component: c.Steinberg_Vst_IComponent,
     edit_controller: c.Steinberg_Vst_IEditController,
+    audio_processor: c.Steinberg_Vst_IAudioProcessor,
 
     const interfaces = [_]Interface{
         Interface{ .cid = c.Steinberg_Vst_IComponent_iid, .ptr_offset = @offsetOf(PluginClass, "component") },
         Interface{ .cid = c.Steinberg_Vst_IEditController_iid, .ptr_offset = @offsetOf(PluginClass, "edit_controller") },
+        Interface{ .cid = c.Steinberg_Vst_IAudioProcessor_iid, .ptr_offset = @offsetOf(PluginClass, "audio_processor") },
     };
 
     const cid = parseGuid("00dd3401-343f-468e-9cf2-f18bdd415890");
@@ -353,6 +538,7 @@ const PluginClass = struct {
         self.* = PluginClass{
             .component = Component(&interfaces).create(),
             .edit_controller = EditController(&interfaces).create(),
+            .audio_processor = AudioProcessor(&interfaces).create(),
         };
 
         return self;

@@ -718,14 +718,14 @@ pub const struct_Steinberg_Vst_ProcessSetup = extern struct {
     maxSamplesPerBlock: Steinberg_int32,
     sampleRate: Steinberg_Vst_SampleRate,
 };
-const union_unnamed_2 = extern union {
-    Steinberg_Vst_AudioBusBuffers_channelBuffers32: [*c][*c]Steinberg_Vst_Sample32,
-    Steinberg_Vst_AudioBusBuffers_channelBuffers64: [*c][*c]Steinberg_Vst_Sample64,
+const Steinberg_AudioBuffers = extern union {
+    channelBuffers32: [*][*]Steinberg_Vst_Sample32,
+    channelBuffers64: [*][*]Steinberg_Vst_Sample64,
 };
 pub const struct_Steinberg_Vst_AudioBusBuffers = extern struct {
     numChannels: Steinberg_int32,
     silenceFlags: Steinberg_uint64,
-    unnamed_0: union_unnamed_2,
+    buffers: Steinberg_AudioBuffers,
 };
 pub const struct_Steinberg_Vst_IParamValueQueueVtbl = extern struct {
     queryInterface: ?*const fn (?*anyopaque, [*c]const u8, [*c]?*anyopaque) callconv(.C) Steinberg_tresult,
@@ -783,8 +783,8 @@ pub const struct_Steinberg_Vst_ProcessData = extern struct {
     numSamples: Steinberg_int32,
     numInputs: Steinberg_int32,
     numOutputs: Steinberg_int32,
-    inputs: [*c]struct_Steinberg_Vst_AudioBusBuffers,
-    outputs: [*c]struct_Steinberg_Vst_AudioBusBuffers,
+    inputs: [*]struct_Steinberg_Vst_AudioBusBuffers,
+    outputs: [*]struct_Steinberg_Vst_AudioBusBuffers,
     inputParameterChanges: [*c]struct_Steinberg_Vst_IParameterChanges,
     outputParameterChanges: [*c]struct_Steinberg_Vst_IParameterChanges,
     inputEvents: [*c]struct_Steinberg_Vst_IEventList,
@@ -792,20 +792,20 @@ pub const struct_Steinberg_Vst_ProcessData = extern struct {
     processContext: [*c]struct_Steinberg_Vst_ProcessContext,
 };
 pub const struct_Steinberg_Vst_IAudioProcessorVtbl = extern struct {
-    queryInterface: *const fn (*anyopaque, [*c]const u8, [*c]?*anyopaque) callconv(.C) Steinberg_tresult,
+    queryInterface: *const fn (*anyopaque, [*]const u8, *?*anyopaque) callconv(.C) Steinberg_tresult,
     addRef: *const fn (*anyopaque) callconv(.C) Steinberg_uint32,
     release: *const fn (*anyopaque) callconv(.C) Steinberg_uint32,
     setBusArrangements: *const fn (*Steinberg_Vst_IAudioProcessor, *Steinberg_Vst_SpeakerArrangement, Steinberg_int32, *Steinberg_Vst_SpeakerArrangement, Steinberg_int32) callconv(.C) Steinberg_tresult,
     getBusArrangement: *const fn (*Steinberg_Vst_IAudioProcessor, Steinberg_Vst_BusDirection, Steinberg_int32, *Steinberg_Vst_SpeakerArrangement) callconv(.C) Steinberg_tresult,
     canProcessSampleSize: *const fn (*Steinberg_Vst_IAudioProcessor, Steinberg_int32) callconv(.C) Steinberg_tresult,
     getLatencySamples: *const fn (*Steinberg_Vst_IAudioProcessor) callconv(.C) Steinberg_uint32,
-    setupProcessing: *const fn (*Steinberg_Vst_IAudioProcessor, [*c]struct_Steinberg_Vst_ProcessSetup) callconv(.C) Steinberg_tresult,
+    setupProcessing: *const fn (*Steinberg_Vst_IAudioProcessor, *struct_Steinberg_Vst_ProcessSetup) callconv(.C) Steinberg_tresult,
     setProcessing: *const fn (*Steinberg_Vst_IAudioProcessor, Steinberg_TBool) callconv(.C) Steinberg_tresult,
-    process: *const fn (*Steinberg_Vst_IAudioProcessor, [*c]struct_Steinberg_Vst_ProcessData) callconv(.C) Steinberg_tresult,
+    process: *const fn (*Steinberg_Vst_IAudioProcessor, *struct_Steinberg_Vst_ProcessData) callconv(.C) Steinberg_tresult,
     getTailSamples: *const fn (*Steinberg_Vst_IAudioProcessor) callconv(.C) Steinberg_uint32,
 };
 pub const struct_Steinberg_Vst_IAudioProcessor = extern struct {
-    lpVtbl: [*c]struct_Steinberg_Vst_IAudioProcessorVtbl,
+    lpVtbl: *const struct_Steinberg_Vst_IAudioProcessorVtbl,
 };
 pub const struct_Steinberg_Vst_DataExchangeBlock = extern struct {
     data: ?*anyopaque,
