@@ -179,16 +179,16 @@ pub const struct_Steinberg_IPlugView = extern struct {
     lpVtbl: [*c]struct_Steinberg_IPlugViewVtbl,
 };
 pub const struct_Steinberg_IBStreamVtbl = extern struct {
-    queryInterface: ?*const fn (?*anyopaque, [*c]const u8, [*c]?*anyopaque) callconv(.C) Steinberg_tresult,
-    addRef: ?*const fn (?*anyopaque) callconv(.C) Steinberg_uint32,
-    release: ?*const fn (?*anyopaque) callconv(.C) Steinberg_uint32,
-    read: ?*const fn (?*anyopaque, ?*anyopaque, Steinberg_int32, [*c]Steinberg_int32) callconv(.C) Steinberg_tresult,
-    write: ?*const fn (?*anyopaque, ?*anyopaque, Steinberg_int32, [*c]Steinberg_int32) callconv(.C) Steinberg_tresult,
-    seek: ?*const fn (?*anyopaque, Steinberg_int64, Steinberg_int32, [*c]Steinberg_int64) callconv(.C) Steinberg_tresult,
-    tell: ?*const fn (?*anyopaque, [*c]Steinberg_int64) callconv(.C) Steinberg_tresult,
+    queryInterface: *const fn (?*anyopaque, [*c]const u8, [*c]?*anyopaque) callconv(.C) Steinberg_tresult,
+    addRef: *const fn (?*anyopaque) callconv(.C) Steinberg_uint32,
+    release: *const fn (?*anyopaque) callconv(.C) Steinberg_uint32,
+    read: *const fn (*anyopaque, *anyopaque, Steinberg_int32, ?*Steinberg_int32) callconv(.C) Steinberg_tresult,
+    write: *const fn (*anyopaque, *anyopaque, Steinberg_int32, ?*Steinberg_int32) callconv(.C) Steinberg_tresult,
+    seek: *const fn (?*anyopaque, Steinberg_int64, Steinberg_int32, [*c]Steinberg_int64) callconv(.C) Steinberg_tresult,
+    tell: *const fn (?*anyopaque, [*c]Steinberg_int64) callconv(.C) Steinberg_tresult,
 };
 pub const struct_Steinberg_IBStream = extern struct {
-    lpVtbl: [*c]struct_Steinberg_IBStreamVtbl,
+    lpVtbl: *const struct_Steinberg_IBStreamVtbl,
 };
 pub const struct_Steinberg_ISizeableStreamVtbl = extern struct {
     queryInterface: ?*const fn (?*anyopaque, [*c]const u8, [*c]?*anyopaque) callconv(.C) Steinberg_tresult,
@@ -368,15 +368,15 @@ pub const struct_Steinberg_Vst_IComponentVtbl = extern struct {
     release: *const fn (*anyopaque) callconv(.C) Steinberg_uint32,
     initialize: *const fn (*anyopaque, *struct_Steinberg_FUnknown) callconv(.C) Steinberg_tresult,
     terminate: *const fn (*anyopaque) callconv(.C) Steinberg_tresult,
-    getControllerClassId: *const fn (*anyopaque, [*c]u8) callconv(.C) Steinberg_tresult,
-    setIoMode: *const fn (*anyopaque, Steinberg_Vst_IoMode) callconv(.C) Steinberg_tresult,
-    getBusCount: *const fn (*anyopaque, Steinberg_Vst_MediaType, Steinberg_Vst_BusDirection) callconv(.C) Steinberg_int32,
-    getBusInfo: *const fn (*anyopaque, Steinberg_Vst_MediaType, Steinberg_Vst_BusDirection, Steinberg_int32, *struct_Steinberg_Vst_BusInfo) callconv(.C) Steinberg_tresult,
-    getRoutingInfo: *const fn (*anyopaque, *struct_Steinberg_Vst_RoutingInfo, *struct_Steinberg_Vst_RoutingInfo) callconv(.C) Steinberg_tresult,
-    activateBus: *const fn (*anyopaque, Steinberg_Vst_MediaType, Steinberg_Vst_BusDirection, Steinberg_int32, Steinberg_TBool) callconv(.C) Steinberg_tresult,
-    setActive: *const fn (*anyopaque, Steinberg_TBool) callconv(.C) Steinberg_tresult,
-    setState: *const fn (*anyopaque, [*c]struct_Steinberg_IBStream) callconv(.C) Steinberg_tresult,
-    getState: *const fn (*anyopaque, [*c]struct_Steinberg_IBStream) callconv(.C) Steinberg_tresult,
+    getControllerClassId: *const fn (*Steinberg_Vst_IComponent, [*]u8) callconv(.C) Steinberg_tresult,
+    setIoMode: *const fn (*Steinberg_Vst_IComponent, Steinberg_Vst_IoMode) callconv(.C) Steinberg_tresult,
+    getBusCount: *const fn (*Steinberg_Vst_IComponent, Steinberg_Vst_MediaType, Steinberg_Vst_BusDirection) callconv(.C) Steinberg_int32,
+    getBusInfo: *const fn (*Steinberg_Vst_IComponent, Steinberg_Vst_MediaType, Steinberg_Vst_BusDirection, Steinberg_int32, *struct_Steinberg_Vst_BusInfo) callconv(.C) Steinberg_tresult,
+    getRoutingInfo: *const fn (*Steinberg_Vst_IComponent, *struct_Steinberg_Vst_RoutingInfo, *struct_Steinberg_Vst_RoutingInfo) callconv(.C) Steinberg_tresult,
+    activateBus: *const fn (*Steinberg_Vst_IComponent, Steinberg_Vst_MediaType, Steinberg_Vst_BusDirection, Steinberg_int32, Steinberg_TBool) callconv(.C) Steinberg_tresult,
+    setActive: *const fn (*Steinberg_Vst_IComponent, Steinberg_TBool) callconv(.C) Steinberg_tresult,
+    setState: *const fn (*Steinberg_Vst_IComponent, *struct_Steinberg_IBStream) callconv(.C) Steinberg_tresult,
+    getState: *const fn (*Steinberg_Vst_IComponent, *struct_Steinberg_IBStream) callconv(.C) Steinberg_tresult,
 };
 pub const struct_Steinberg_Vst_IComponent = extern struct {
     lpVtbl: *const struct_Steinberg_Vst_IComponentVtbl,
@@ -604,12 +604,12 @@ pub const struct_Steinberg_Vst_IEventListVtbl = extern struct {
     queryInterface: ?*const fn (?*anyopaque, [*c]const u8, [*c]?*anyopaque) callconv(.C) Steinberg_tresult,
     addRef: ?*const fn (?*anyopaque) callconv(.C) Steinberg_uint32,
     release: ?*const fn (?*anyopaque) callconv(.C) Steinberg_uint32,
-    getEventCount: ?*const fn (?*anyopaque) callconv(.C) Steinberg_int32,
-    getEvent: ?*const fn (?*anyopaque, Steinberg_int32, [*c]struct_Steinberg_Vst_Event) callconv(.C) Steinberg_tresult,
-    addEvent: ?*const fn (?*anyopaque, [*c]struct_Steinberg_Vst_Event) callconv(.C) Steinberg_tresult,
+    getEventCount: *const fn (*Steinberg_Vst_IEventList) callconv(.C) Steinberg_int32,
+    getEvent: *const fn (*Steinberg_Vst_IEventList, Steinberg_int32, *struct_Steinberg_Vst_Event) callconv(.C) Steinberg_tresult,
+    addEvent: *const fn (*Steinberg_Vst_IEventList, [*c]struct_Steinberg_Vst_Event) callconv(.C) Steinberg_tresult,
 };
 pub const struct_Steinberg_Vst_IEventList = extern struct {
-    lpVtbl: [*c]struct_Steinberg_Vst_IEventListVtbl,
+    lpVtbl: *const struct_Steinberg_Vst_IEventListVtbl,
 };
 pub const struct_Steinberg_Vst_IMessageVtbl = extern struct {
     queryInterface: ?*const fn (?*anyopaque, [*c]const u8, [*c]?*anyopaque) callconv(.C) Steinberg_tresult,
@@ -787,7 +787,7 @@ pub const struct_Steinberg_Vst_ProcessData = extern struct {
     outputs: [*]struct_Steinberg_Vst_AudioBusBuffers,
     inputParameterChanges: [*c]struct_Steinberg_Vst_IParameterChanges,
     outputParameterChanges: [*c]struct_Steinberg_Vst_IParameterChanges,
-    inputEvents: [*c]struct_Steinberg_Vst_IEventList,
+    inputEvents: *struct_Steinberg_Vst_IEventList,
     outputEvents: [*c]struct_Steinberg_Vst_IEventList,
     processContext: [*c]struct_Steinberg_Vst_ProcessContext,
 };
