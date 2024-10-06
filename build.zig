@@ -7,7 +7,7 @@ pub fn build(b: *std.Build) void {
 
     const lib = b.addSharedLibrary(.{
         .name = "HelloVST3",
-        .root_source_file = .{ .path = "src/plugin.zig" },
+        .root_source_file = b.path("src/plugin.zig"),
         .target = target,
         .optimize = optimize,
     });
